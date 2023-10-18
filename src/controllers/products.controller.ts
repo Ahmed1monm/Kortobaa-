@@ -19,20 +19,25 @@ dotenv.config();
  * @param  {Object} res - Express response object
  */
 export async function updateProduct  (req: Request, res: Response): Promise<Response> {
-    // TODO write a middleware to authorize user to update it's own data
     // TODO: upload image buy multer and use the path in the body im image
     // TODO: validate data
     try {
         const { id} = req.params;
         const { title, price } = req.body;
         const {user}: jwt.JwtPayload = req;
+        const image = req.file;
+        let image_path : string|null = null;
+
+        if(image !== undefined){
+             image_path = `${req.hostname}:${process.env.PORT || 3000}/${image?.path}`;
+        }
 
         const existingProduct:IProduct|null = await findProductById(parseInt(id));
 
         if(!existingProduct) return res.status(404).json({ message: "product not found" });
         if(existingProduct.user_id !== user?.id) return res.status(401).json({ message: "unauthorized: you can only update your own product" });
 
-        const product:[affectedCount: number] = await updateOneProduct(parseInt(id), { title, price });
+        const product:[affectedCount: number] = await updateOneProduct(parseInt(id), { title, price, image:image_path ?? existingProduct.image });
 
         return res
             .status(200)

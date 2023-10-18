@@ -9,7 +9,7 @@ export interface IProduct extends Model {
     user_id: number;
 }
 
-const ProductModel:ModelCtor<IProduct> = sequelize.define<IProduct>(
+export const ProductModel:ModelCtor<IProduct> = sequelize.define<IProduct>(
   "product",
   {
     id: {
